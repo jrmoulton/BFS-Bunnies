@@ -1,12 +1,10 @@
 
-#include <iostream>
+#include "headers.h"
 using namespace std;
 
 class SimplePoint {
    public:
-    int x;
-    int y;
-    int val;
+    int x, y, val;
 
     SimplePoint() { return; }
 
@@ -19,7 +17,8 @@ class SimplePoint {
 
 class Point : public SimplePoint {
    public:
-    Point *neighbors[];
+    vector<Point *> neighbors;
+    vector<SimplePoint *> history;
 
     Point() { return; }
 
@@ -30,44 +29,88 @@ class Point : public SimplePoint {
     }
 };
 
+template <typename T>
 class Node {
    public:
-    Node *pPrev;
-    Node *pNext;
-    Point value;
+    Node *pPrev, *pNext;
+    T value;
 
-    Node(Point aValue) {
+    Node(T aValue) {
         pPrev = this;
         pNext = this;
         value = aValue;
     }
-    // Node()
 };
 
+template <typename T>
 class Queue {
    public:
-    Node *pHead;
-    Node *pTail;
+    Node<T> *pHead, *pTail;
+    int count;
 
     Queue() {
         pHead = nullptr;
         pTail = nullptr;
+        count = 0;
     }
-    Queue(Node aHead) {
-        pHead = &aHead;
-        pTail = &aHead;
-    }
-
-    Point pop() {
-        Node temp = *pHead;
-        pHead = temp.pNext;
-        return temp.value;
+    Queue(T aHead) {
+        Node<T> temp = Node<T>(aHead);
+        pHead = &temp;
+        pTail = &temp;
+        count = 1;
     }
 
-    void append(Point aTail) { temp = Node(aTail); }
+    T *pop() {
+        if (count == 0) {
+            return nullptr;
+        }
+        count -= 1;
+        Node<T> *temp = pHead;
+        pHead = temp->pNext;
+        T *data = &temp->value;
+        delete temp;
+        return data;
+    }
+
+    void append(T aTail) {
+        Node<T> *temp = new Node<T>(aTail);
+        if (pTail == nullptr) {
+            temp->pPrev = temp;
+            temp->pNext = temp;
+            pHead = temp;
+        } else {
+            temp->pPrev = pTail;
+            pTail->pNext = temp;
+        }
+        pTail = temp;
+        count += 1;
+    }
+
+    bool isEmpty() {
+        if (count == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 };
 
-int main() {
-    Queue temp(Node(Point(2, 0, 0)));
-    cout << temp.pHead->value.x << endl;
+const int maze1[6][6] = {
+    {0, 0, 0, 0, 0, 0}, {1, 1, 1, 1, 1, 0}, {1, 1, 1, 1, 1, 1},
+    {0, 0, 0, 0, 0, 0}, {0, 1, 1, 1, 1, 1}, {0, 0, 0, 0, 0, 0},
+};
+
+int answer(int maze[]) {
+    Queue<Point> queue(Point(0, 0, 0));
+
+    while (!queue.isEmpty()) {
+        Point activePoint = *queue.pop();
+        if (activePoint.x == 0 && activePoint.y == 0) {
+            return 5;
+            // return activePoint.history.size();
+        }
+    }
+    return 3;
 }
+
+int main() {}
