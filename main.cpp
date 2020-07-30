@@ -1,4 +1,6 @@
 
+#include <chrono>
+
 #include "headers.h"
 using namespace std;
 
@@ -168,16 +170,32 @@ const vector<vector<int>> maze6 = {
 
 class Timer {
    public:
-    std::__1::chrono::steady_clock::time_point m_StartTime;
-    Timer() { auto m_StartTime = std::chrono::high_resolution_clock::now(); }
+    // m_StartTime = std::chrono::high_resolution_clock::now();
+    Timer() { m_StartTime = std::chrono::high_resolution_clock::now(); }
     ~Timer() { stop(); }
     void stop() {
-        std::cout << std::chrono::high_resolution_clock::now() - m_StartTime
-                  << endl;
+        auto endTime = std::chrono::high_resolution_clock::now();
+
+        auto start =
+            std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTime)
+                .time_since_epoch()
+                .count();
+        auto end =
+            std::chrono::time_point_cast<std::chrono::microseconds>(endTime)
+                .time_since_epoch()
+                .count();
+        auto us = end - start;
+        double ms = us * 0.001;
+        double s = ms * 0.0001;
+        std::cout << "ms: " << ms << endl;
     }
-}
+
+   private:
+    std::chrono::time_point<std::chrono::high_resolution_clock> m_StartTime;
+};
 
 int answer(vector<vector<int>> maze) {
+    Timer timer;
     Point startPoint = Point(0, 0, 0);
     startPoint.neighbors = startPoint.getNeighbors(&maze);
     Queue<Point> queue(startPoint);
