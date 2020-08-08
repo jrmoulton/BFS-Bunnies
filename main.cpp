@@ -1,6 +1,4 @@
 
-#include <chrono>
-
 #include "headers.h"
 using namespace std;
 
@@ -226,4 +224,4 @@ int answer(vector<vector<int>> maze) {
     return 100000;
 }
 
-int main() { std::cout << answer(maze6) << endl; }
+int main() { answer(maze6); }
