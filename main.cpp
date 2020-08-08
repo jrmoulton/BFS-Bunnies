@@ -76,68 +76,6 @@ std::ostream &operator<<(std::ostream &os, Point &m) {
               << m.neighbors.size();
 }
 
-template <typename T>
-class Node {
-   public:
-    Node *pPrev, *pNext;
-    T value;
-
-    Node(T aValue) : value(aValue) {}
-};
-
-template <typename T>
-class Queue {
-   public:
-    Node<T> *pHead, *pTail;
-    int count;
-
-    Queue() {
-        pHead = nullptr;
-        pTail = nullptr;
-        count = 0;
-    }
-    Queue(T aHead) {
-        Node<T> *temp = new Node<T>(aHead);
-        pHead = temp;
-        pTail = temp;
-        count = 1;
-    }
-
-    std::optional<T> pop() {
-        if (count == 0) {
-            return nullopt;
-        }
-        count -= 1;
-        Node<T> *temp = pHead;
-        pHead = temp->pNext;
-        T data = temp->value;
-        delete temp;
-        return data;
-    }
-
-    void append(T aTail) {
-        Node<T> *temp = new Node<T>(aTail);
-        if (count == 0) {
-            temp->pPrev = temp;
-            temp->pNext = temp;
-            pHead = temp;
-        } else {
-            temp->pPrev = pTail;
-            pTail->pNext = temp;
-        }
-        pTail = temp;
-        count += 1;
-    }
-
-    bool isEmpty() {
-        if (count == 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-};
-
 const vector<vector<int>> maze1 = {
     {0, 0, 0, 0, 0, 0}, {1, 1, 1, 1, 1, 0}, {1, 1, 1, 1, 1, 1},
     {0, 0, 0, 0, 0, 0}, {0, 1, 1, 1, 1, 1}, {0, 0, 0, 0, 0, 0},
@@ -196,9 +134,10 @@ int answer(vector<vector<int>> maze) {
     Timer timer;
     Point startPoint = Point(0, 0, 0);
     startPoint.neighbors = startPoint.getNeighbors(&maze);
-    Queue<Point> queue(startPoint);
-    while (!queue.isEmpty()) {
-        Point activePoint = *queue.pop();
+    std::vector<Point> queue({startPoint});
+    while (!queue.empty()) {
+        Point activePoint = queue.back();
+        queue.pop_back();
         activePoint.history.push_back(activePoint.simple);
         if (activePoint.x == maze[0].size() - 1 &&
             activePoint.y == maze.size() - 1) {
@@ -211,11 +150,11 @@ int answer(vector<vector<int>> maze) {
                 temp.neighbors = temp.getNeighbors(&maze);
                 if (neighbor.val == 0) {
                     temp.saldo = activePoint.saldo;
-                    queue.append(temp);
+                    queue.push_back(temp);
                 } else {
                     if (activePoint.saldo < 1) {
                         temp.saldo += 1;
-                        queue.append(temp);
+                        queue.push_back(temp);
                     }
                 }
             }
