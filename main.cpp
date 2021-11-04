@@ -1,4 +1,5 @@
 
+#include "customQueue.cpp"
 #include "headers.h"
 #include "testCases.h"
 
@@ -104,8 +105,10 @@ int answer(std::vector<std::vector<int>> maze) {
     Timer timer;
     Point startPoint = Point(0, 0, 0);
     startPoint.neighbors = startPoint.getNeighbors(&maze);
+    // Queue queue(startPoint);
     std::vector<Point> queue({startPoint});
     while (!queue.empty()) {
+        // Point activePoint = *queue.pop();
         Point activePoint = queue.back();
         queue.pop_back();
         activePoint.history.push_back(activePoint.simple);
@@ -120,10 +123,12 @@ int answer(std::vector<std::vector<int>> maze) {
                 temp.neighbors = temp.getNeighbors(&maze);
                 if (neighbor.val == 0) {
                     temp.saldo = activePoint.saldo;
+                    // queue.append(temp);
                     queue.push_back(temp);
                 } else {
                     if (activePoint.saldo < 1) {
                         temp.saldo += 1;
+                        // queue.append(temp);
                         queue.push_back(temp);
                     }
                 }
